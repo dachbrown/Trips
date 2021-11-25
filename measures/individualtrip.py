@@ -64,9 +64,13 @@ def trip_metrics(tdf):
                                                                         x[constants.BUSINESS_DAY]), axis=1)
     tdf.loc[:, constants.EVENING_RUSH] = tdf.apply(lambda x: _eve_rush(x[constants.HOUR],
                                                                        x[constants.BUSINESS_DAY]), axis=1)
-
+    # distance group
     tdf.loc[:, constants.DIST_GRP] = _dist_groups(tdf[constants.TRAVELLED_DISTANCE])
     tdf = pd.get_dummies(tdf, columns=[constants.DIST_GRP])
+
+    # day of week
+    tdf.loc[:, constants.DOW] = tdf[constants.ORIGIN_TIME].apply(_day_of_week)
+    
     return tdf
 
 

@@ -8,6 +8,7 @@ import inspect
 tqdm.pandas()
 from collections import Counter
 
+
 def create_trip_df(tdf):
     """ Trip segmentation.
 
