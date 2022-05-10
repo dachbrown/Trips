@@ -27,7 +27,7 @@ def trip_metrics(tdf):
 
     # Find trip acceleration and jerk trajectory
     tdf.loc[:, constants.ACC] = [np.gradient(t, 1) for t in tdf[constants.SPEED]]
-    tdf.loc[:, constants.JERK] = [np.gradient(t, 2) for t in tdf[constants.SPEED]]
+    tdf.loc[:, constants.JERK] = [np.gradient(t, 1) for t in tdf[constants.ACC]]
 
     # Find trip straightline and travelled distance
     tdf.loc[:, constants.TRAVELLED_DISTANCE] = tdf[constants.DISTANCE].apply(_travelled_dist)
@@ -228,11 +228,11 @@ def _hour(dt):
 
 
 if __name__ == "__main__":
-    data = pd.read_pickle("D:/trips2.pkl")
+    data = pd.read_pickle("/Users/sayehbayat/Documents/Data/trips2.pkl")
     data = trip_metrics(data)
     print(np.percentile(data[constants.TRAVELLED_DISTANCE], 2.5))
     print(np.percentile(data[constants.TRAVELLED_DISTANCE], 97.5))
     print(np.percentile(data[constants.DURATION], 2.5))
     print(np.percentile(data[constants.DURATION], 97.5))
     print(data.head())
-    data.to_pickle("D:/trips_metrics.pkl")
+    data.to_pickle("/Users/sayehbayat/Documents/Data/trips_metrics.pkl")
