@@ -136,7 +136,7 @@ def _over_speeding(diff):
     :param diff: speed - speed_limit
     :return: count of overspeeding events, duration of overspeeding in seconds
     """
-    cnt = np.sum(diff > 10)
+    cnt = np.nansum(diff > 10)
     return cnt, cnt*30
 
 
@@ -147,7 +147,7 @@ def _under_speeding(diff):
     :param diff: speed - speed_limit
     :return: count of underspeeding events, duration of underspeeding in seconds
     """
-    cnt = np.sum(diff < -10)
+    cnt = np.nansum(diff < -10)
     return cnt, cnt*30
 
 
