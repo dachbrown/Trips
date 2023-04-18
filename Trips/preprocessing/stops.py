@@ -8,9 +8,12 @@ def stops(tdf):
     :param tdf:
     :return:
     """
-    stp = tdf.groupby(tdf[constants.UID]).apply(lambda grp: _stops_individual(tdf))
-    stp.reset_index(drop=True, inplace=True)
-    return stp
+    stps = []
+    for u in tdf[constants.UID].unique():
+        tdfi = tdf[tdf.uid == u]
+        stp = _stops_individual(tdfi)
+        stps.append(stp)
+    return pd.concat(stps)
 
 
 def _stops_individual(tdf):
@@ -19,7 +22,7 @@ def _stops_individual(tdf):
     :param tdf: trip dataframe
     :return: stop dataframe
     """
-    sdf = tdf[[constants.DESTINATION_LAT, constants.DESTINATION_LNG, constants.DESTINATION_TIME]]
+    sdf = tdf[[constants.DESTINATION_LAT, constants.DESTINATION_LNG, constants.DESTINATION_TIME, constants.UID]]
     sdf = sdf.rename(columns={constants.DESTINATION_TIME: constants.ORIGIN_TIME,
                               constants.DESTINATION_LAT: constants.ORIGIN_LAT,
                               constants.DESTINATION_LNG: constants.ORIGIN_LNG})
@@ -30,8 +33,9 @@ def _stops_individual(tdf):
 
 
 if __name__ == "__main__":
-    data = pd.read_pickle("D:/trips_metrics.pkl")
+    data = pd.read_pickle("/Users/sayehbayat/Documents/Data/trips_metrics.pkl")
+    print('printed')
     SDF = stops(data)
     print(SDF)
-    SDF.to_pickle("D:/stops.pkl")
+    SDF.to_pickle("/Users/sayehbayat/Documents/Data/stops.pkl")
     exit()

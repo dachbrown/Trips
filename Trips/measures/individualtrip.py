@@ -47,8 +47,12 @@ def trip_metrics(tdf):
                                                      x[constants.DATETIME]), axis=1)
     # Number of special events
     tdf.loc[:, constants.HB], tdf.loc[:, constants.HCB], tdf.loc[:, constants.HA] = zip(*tdf[constants.EVENT].apply(_event_count))
-    tdf.loc[:, constants.COUNT_OS],  tdf.loc[:, constants.DUR_OS] = zip(*tdf[constants.DIFFERENCE].apply(_over_speeding))
-    tdf.loc[:, constants.COUNT_US], tdf.loc[:, constants.DUR_US] = zip(*tdf[constants.DIFFERENCE].apply(_under_speeding))
+    tdf.loc[:, constants.COUNT_OS], tdf.loc[:, constants.DUR_OS] = \
+        zip(*tdf.apply(lambda x: _over_speeding(x[constants.SPEED], x[constants.LIMIT]), axis=1))
+    tdf.loc[:, constants.COUNT_US], tdf.loc[:, constants.DUR_US] = \
+        zip(*tdf.apply(lambda x: _over_speeding(x[constants.SPEED], x[constants.LIMIT]), axis=1))
+    #tdf.loc[:, constants.COUNT_OS],  tdf.loc[:, constants.DUR_OS] = zip(*tdf[constants.DIFFERENCE].apply(_over_speeding))
+    #tdf.loc[:, constants.COUNT_US], tdf.loc[:, constants.DUR_US] = zip(*tdf[constants.DIFFERENCE].apply(_under_speeding))
 
     # Trip duration
     tdf.loc[:, constants.DURATION] = tdf[constants.DATETIME].apply(_duration)
@@ -129,24 +133,54 @@ def _dark(lat, lng, dt):
     return int(d_time.time() > pd.to_datetime(s['dusk']).time())
 
 
-def _over_speeding(diff):
+def _over_speeding(speed, speed_limit):
     """
     Compute count and duration of overspeeding (speed > 10mp + speed limit) events
     in a trip.
     :param diff: speed - speed_limit
     :return: count of overspeeding events, duration of overspeeding in seconds
     """
+    start = None
+    end = None
+    # Get the start and end index
+    for index, element in enumerate(speed):
+        if element != 0 and not start:
+            start = str(index)
+            end = str(index)
+            continue
+        if element != 0 and start:
+            end = str(index)
+
+    # Slice both the lists using the obtained start and end indices
+    y_removed = speed[int(start): int(end) + 1]
+    t = speed_limit[int(start): int(end) + 1]
+    diff = y_removed - t
     cnt = np.nansum(diff > 10)
     return cnt, cnt*30
 
 
-def _under_speeding(diff):
+def _under_speeding(speed, speed_limit):
     """
     Compute count and duration of underspeeding (speed > 10mp + speed limit) events
     in a trip.
     :param diff: speed - speed_limit
     :return: count of underspeeding events, duration of underspeeding in seconds
     """
+    start = None
+    end = None
+    # Get the start and end index
+    for index, element in enumerate(speed):
+        if element != 0 and not start:
+            start = str(index)
+            end = str(index)
+            continue
+        if element != 0 and start:
+            end = str(index)
+
+    # Slice both the lists using the obtained start and end indices
+    y_removed = speed[int(start): int(end) + 1]
+    t = speed_limit[int(start): int(end) + 1]
+    diff = y_removed - t
     cnt = np.nansum(diff < -10)
     return cnt, cnt*30
 

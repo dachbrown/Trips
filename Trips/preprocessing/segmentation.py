@@ -1,10 +1,7 @@
-from Trips.utils import constants
 import numpy as np
-from scipy import stats
-import pandas as pd
 from tqdm import tqdm
 from Trips.core.trajectorydataframe import *
-import inspect
+
 tqdm.pandas()
 from collections import Counter
 

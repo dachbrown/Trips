@@ -1,6 +1,5 @@
 import pandas as pd
-from ..utils import constants, utils
-import numpy as np
+from Trips.utils import constants
 
 
 class TrajectoryDF(pd.DataFrame):
